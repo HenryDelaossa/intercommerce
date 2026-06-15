@@ -3,6 +3,7 @@ import { useProductFilters } from '../hooks/filters/useProductFilters';
 import { useProductsQuery } from '../hooks/products/useProductsQuery';
 import { useCategoriesQuery } from '../hooks/products/useCategoriesQuery';
 import { useCart } from '../hooks/cart/useCart';
+import { useBuyNow } from '../hooks/cart/useBuyNow';
 import { ProductFilters } from '../components/products/ProductFilters';
 import { ProductGrid } from '../components/products/ProductGrid';
 import { InfiniteScrollSentinel } from '../components/products/InfiniteScrollSentinel';
@@ -14,15 +15,23 @@ export function ProductsPage() {
   const { searchInput, search, category, setSearch, setCategory } = useProductFilters();
   const { data: categories } = useCategoriesQuery();
   const { addItem } = useCart();
+  const { buyNow } = useBuyNow();
 
   const { products, total, isLoading, isError, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useProductsQuery({ search, category });
 
   const handleAddToCart = useCallback(
-    (product: Product) => {
-      addItem(product);
+    (product: Product, quantity: number) => {
+      addItem(product, quantity);
     },
     [addItem],
+  );
+
+  const handleBuyNow = useCallback(
+    (product: Product, quantity: number) => {
+      buyNow(product, quantity);
+    },
+    [buyNow],
   );
 
   const handleFetchNext = useCallback(() => {
@@ -60,6 +69,7 @@ export function ProductsPage() {
           products={products}
           isLoading={isLoading || isFetchingNextPage}
           onAddToCart={handleAddToCart}
+          onBuyNow={handleBuyNow}
         />
       )}
 

@@ -7,9 +7,12 @@ import type { Product } from '../types/product';
 interface CartState {
   items: CartItem[];
   addItem: (product: Product, quantity?: number) => void;
+  addCartItem: (item: CartItem) => void;
+  setItems: (items: CartItem[]) => void;
   removeItem: (id: number) => void;
   incrementItem: (id: number) => void;
   decrementItem: (id: number) => void;
+  updateItemStock: (id: number, stock: number) => void;
   clearCart: () => void;
 }
 
@@ -25,7 +28,11 @@ export const useCartStore = create<CartState>()(
           set({
             items: get().items.map((item) =>
               item.id === product.id
-                ? { ...item, quantity: Math.min(item.quantity + quantity, item.stock) }
+                ? {
+                    ...item,
+                    stock: product.stock,
+                    quantity: Math.min(item.quantity + quantity, product.stock),
+                  }
                 : item,
             ),
           });
@@ -47,6 +54,29 @@ export const useCartStore = create<CartState>()(
         });
       },
 
+      addCartItem: (item) => {
+        const existing = get().items.find((cartItem) => cartItem.id === item.id);
+
+        if (existing) {
+          set({
+            items: get().items.map((cartItem) =>
+              cartItem.id === item.id
+                ? {
+                    ...cartItem,
+                    stock: item.stock,
+                    quantity: Math.min(cartItem.quantity + item.quantity, item.stock),
+                  }
+                : cartItem,
+            ),
+          });
+          return;
+        }
+
+        set({ items: [...get().items, { ...item, quantity: Math.min(item.quantity, item.stock) }] });
+      },
+
+      setItems: (items) => set({ items }),
+
       removeItem: (id) => {
         set({ items: get().items.filter((item) => item.id !== id) });
       },
@@ -64,6 +94,16 @@ export const useCartStore = create<CartState>()(
           items: get()
             .items.map((item) =>
               item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+            )
+            .filter((item) => item.quantity > 0),
+        });
+      },
+
+      updateItemStock: (id, stock) => {
+        set({
+          items: get()
+            .items.map((item) =>
+              item.id === id ? { ...item, stock, quantity: Math.min(item.quantity, stock) } : item,
             )
             .filter((item) => item.quantity > 0),
         });

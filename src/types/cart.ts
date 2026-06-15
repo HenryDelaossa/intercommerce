@@ -7,6 +7,8 @@ export interface CartItem {
   stock: number;
 }
 
+export type CartItemData = Omit<CartItem, 'quantity'>;
+
 export interface CartSummary {
   itemCount: number;
   subtotal: number;

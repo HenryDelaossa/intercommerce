@@ -6,7 +6,8 @@ interface ProductGridProps {
   products: Product[];
   isLoading: boolean;
   skeletonCount?: number;
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
+  onBuyNow: (product: Product, quantity: number) => void;
 }
 
 export function ProductGrid({
@@ -14,11 +15,12 @@ export function ProductGrid({
   isLoading,
   skeletonCount = 8,
   onAddToCart,
+  onBuyNow,
 }: ProductGridProps) {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
+        <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} onBuyNow={onBuyNow} />
       ))}
       {isLoading &&
         Array.from({ length: skeletonCount }).map((_, index) => (
