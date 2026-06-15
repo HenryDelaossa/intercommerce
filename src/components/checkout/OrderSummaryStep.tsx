@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useCart } from '../../hooks/cart/useCart';
 import { useCheckout } from '../../hooks/cart/useCheckout';
 import { useStockSync } from '../../hooks/cart/useStockSync';
@@ -54,10 +55,22 @@ export function OrderSummaryStep() {
 
       <ul className="flex flex-col gap-2 text-sm text-brand-dark">
         {items.map((item) => (
-          <li key={item.id} className="flex justify-between">
-            <span className="line-clamp-1">
+          <li key={item.id} className="flex items-center gap-3">
+            <Link to={`/product/${item.id}`} target="_blank" rel="noopener noreferrer" className="shrink-0">
+              <img
+                src={item.thumbnail}
+                alt={item.title}
+                className="h-12 w-12 rounded-md border border-black/10 object-cover"
+              />
+            </Link>
+            <Link
+              to={`/product/${item.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="line-clamp-1 flex-1 hover:text-brand-primary hover:underline"
+            >
               {item.title} x{item.quantity}
-            </span>
+            </Link>
             <span className="whitespace-nowrap">{formatPrice(item.price * item.quantity)}</span>
           </li>
         ))}
