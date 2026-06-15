@@ -1,6 +1,7 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type DragEvent } from 'react';
 import clsx from 'clsx';
 import { useCart } from '../../hooks/cart/useCart';
+import type { CartItemData } from '../../types/cart';
 import { useCheckout } from '../../hooks/cart/useCheckout';
 import { useStockSync } from '../../hooks/cart/useStockSync';
 import { useUiStore } from '../../store/ui.store';
@@ -12,10 +13,40 @@ import { Button } from '../ui/Button';
 export function CartDrawer() {
   const isCartOpen = useUiStore((state) => state.isCartOpen);
   const closeCart = useUiStore((state) => state.closeCart);
-  const { items, summary, incrementItem, decrementItem, removeItem, clearCart } = useCart();
+  const isDragging = useUiStore((state) => state.isDragging);
+  const { items, summary, incrementItem, decrementItem, removeItem, clearCart, addItemFromData } = useCart();
   const { confirmPurchase } = useCheckout();
   const { syncStock } = useStockSync();
   const asideRef = useRef<HTMLElement>(null);
+  const [isDragOverDrawer, setIsDragOverDrawer] = useState(false);
+
+  const handleDrawerDragOver = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+    setIsDragOverDrawer(true);
+  };
+
+  const handleDrawerDragLeave = (event: DragEvent<HTMLElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+      setIsDragOverDrawer(false);
+    }
+  };
+
+  const handleDrawerDrop = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    setIsDragOverDrawer(false);
+    const raw = event.dataTransfer.getData('application/json');
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw) as CartItemData & { quantity: number };
+      addItemFromData(
+        { id: data.id, title: data.title, price: data.price, thumbnail: data.thumbnail, stock: data.stock },
+        data.quantity,
+      );
+    } catch {
+      // ignore malformed drag payload
+    }
+  };
 
   useEffect(() => {
     if (isCartOpen) {
@@ -34,16 +65,20 @@ export function CartDrawer() {
       <div
         className={clsx(
           'fixed inset-0 z-40 bg-black/40 transition-opacity',
-          isCartOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
+          isCartOpen && !isDragging ? 'opacity-100' : 'pointer-events-none opacity-0',
         )}
         onClick={closeCart}
         aria-hidden="true"
       />
       <aside
         ref={asideRef}
+        onDragOver={handleDrawerDragOver}
+        onDragLeave={handleDrawerDragLeave}
+        onDrop={handleDrawerDrop}
         className={clsx(
           'fixed top-0 right-0 z-50 flex h-full w-full max-w-sm flex-col bg-brand-light shadow-xl transition-transform',
           isCartOpen ? 'translate-x-0' : 'translate-x-full',
+          isDragOverDrawer && 'ring-2 ring-inset ring-brand-primary',
         )}
         role="dialog"
         aria-label="Carrito de compras"
@@ -62,6 +97,18 @@ export function CartDrawer() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
+          {isDragging && (
+            <div
+              className={clsx(
+                'mb-4 rounded-lg border-2 border-dashed p-4 text-center text-sm transition-colors',
+                isDragOverDrawer
+                  ? 'border-brand-primary bg-brand-primary/10 font-medium text-brand-primary'
+                  : 'border-black/20 text-brand-dark/50',
+              )}
+            >
+              {isDragOverDrawer ? '¡Suelta para agregar al carrito!' : 'Arrastra un producto aquí'}
+            </div>
+          )}
           {items.length === 0 ? (
             <EmptyState title="Tu carrito está vacío" description="Agrega productos para comenzar." />
           ) : (

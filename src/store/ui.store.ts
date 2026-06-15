@@ -16,6 +16,10 @@ interface UiState {
   isBuyNowModalOpen: boolean;
   openBuyNowModal: () => void;
   closeBuyNowModal: () => void;
+  isDragging: boolean;
+  cartAutoOpened: boolean;
+  startDragging: () => void;
+  stopDragging: (dropped: boolean) => void;
 }
 
 export const useUiStore = create<UiState>()((set, get) => ({
@@ -38,4 +42,17 @@ export const useUiStore = create<UiState>()((set, get) => ({
   isBuyNowModalOpen: false,
   openBuyNowModal: () => set({ isBuyNowModalOpen: true }),
   closeBuyNowModal: () => set({ isBuyNowModalOpen: false }),
+
+  isDragging: false,
+  cartAutoOpened: false,
+  startDragging: () => {
+    const alreadyOpen = get().isCartOpen;
+    set({ isDragging: true, cartAutoOpened: !alreadyOpen });
+    if (!alreadyOpen) set({ isCartOpen: true });
+  },
+  stopDragging: (dropped) => {
+    const { cartAutoOpened } = get();
+    set({ isDragging: false, cartAutoOpened: false });
+    if (cartAutoOpened && !dropped) set({ isCartOpen: false });
+  },
 }));
