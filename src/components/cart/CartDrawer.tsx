@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import clsx from 'clsx';
 import { useCart } from '../../hooks/cart/useCart';
+import { useCheckout } from '../../hooks/cart/useCheckout';
+import { useStockSync } from '../../hooks/cart/useStockSync';
 import { useUiStore } from '../../store/ui.store';
 import { CartItemRow } from './CartItemRow';
 import { CartSummary } from './CartSummary';
@@ -10,6 +13,14 @@ export function CartDrawer() {
   const isCartOpen = useUiStore((state) => state.isCartOpen);
   const closeCart = useUiStore((state) => state.closeCart);
   const { items, summary, incrementItem, decrementItem, removeItem, clearCart } = useCart();
+  const { confirmPurchase } = useCheckout();
+  const { syncStock } = useStockSync();
+
+  useEffect(() => {
+    if (isCartOpen) {
+      void syncStock();
+    }
+  }, [isCartOpen, syncStock]);
 
   return (
     <>
@@ -63,6 +74,7 @@ export function CartDrawer() {
         {items.length > 0 && (
           <div className="flex flex-col gap-3 border-t border-black/10 p-4">
             <CartSummary summary={summary} />
+            <Button onClick={confirmPurchase}>Confirmar compra</Button>
             <Button variant="secondary" onClick={clearCart}>
               Vaciar carrito
             </Button>
