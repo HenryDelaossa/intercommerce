@@ -6,6 +6,7 @@ import { useCart } from '../hooks/cart/useCart';
 import { useBuyNow } from '../hooks/cart/useBuyNow';
 import { ProductFilters } from '../components/products/ProductFilters';
 import { ProductGrid } from '../components/products/ProductGrid';
+import { RecentlyViewedList } from '../components/products/RecentlyViewedList';
 import { InfiniteScrollSentinel } from '../components/products/InfiniteScrollSentinel';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorMessage } from '../components/ui/ErrorMessage';
@@ -46,6 +47,8 @@ export function ProductsPage() {
           {total > 0 ? `${total} productos encontrados` : ' '}
         </p>
       </div>
+
+      <RecentlyViewedList />
 
       <ProductFilters
         searchInput={searchInput}

@@ -56,3 +56,11 @@ export interface ProductCategory {
   name: string;
   url: string;
 }
+
+export interface RecentlyViewedProduct {
+  id: number;
+  title: string;
+  price: number;
+  discountPercentage: number;
+  thumbnail: string;
+}

@@ -21,3 +21,7 @@ export const SHIPPING_COST = 2;
 export const COUPON_CODE_LENGTH = 10;
 
 export const CHECKOUT_ADDRESS_STORAGE_KEY = 'intercommerce-checkout-address';
+
+export const RECENTLY_VIEWED_STORAGE_KEY = 'intercommerce-recently-viewed';
+
+export const RECENTLY_VIEWED_MAX = 10;
