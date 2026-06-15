@@ -1,7 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useProductQuery } from '../hooks/products/useProductQuery';
 import { useCart } from '../hooks/cart/useCart';
+import { useBuyNow } from '../hooks/cart/useBuyNow';
+import { useRecentlyViewed } from '../hooks/products/useRecentlyViewed';
 import { ProductGallery } from '../components/product-detail/ProductGallery';
 import { ProductInfo } from '../components/product-detail/ProductInfo';
 import { Skeleton } from '../components/ui/Skeleton';
@@ -12,12 +14,28 @@ export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading, isError, error, refetch } = useProductQuery(id);
   const { addItem } = useCart();
+  const { buyNow } = useBuyNow();
+  const { addProduct } = useRecentlyViewed();
+
+  useEffect(() => {
+    if (product) {
+      addProduct(product);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id]);
 
   const handleAddToCart = useCallback(
     (product: Product, quantity: number) => {
       addItem(product, quantity);
     },
     [addItem],
+  );
+
+  const handleBuyNow = useCallback(
+    (product: Product, quantity: number) => {
+      buyNow(product, quantity);
+    },
+    [buyNow],
   );
 
   return (
@@ -51,7 +69,7 @@ export function ProductDetailPage() {
       {!isLoading && !isError && product && (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <ProductGallery images={product.images} title={product.title} />
-          <ProductInfo product={product} onAddToCart={handleAddToCart} />
+          <ProductInfo product={product} onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />
         </div>
       )}
     </div>

@@ -6,11 +6,12 @@ import type { Product } from '../../types/product';
 interface ProductInfoProps {
   product: Product;
   onAddToCart: (product: Product, quantity: number) => void;
+  onBuyNow: (product: Product, quantity: number) => void;
 }
 
 const FEEDBACK_DURATION_MS = 1500;
 
-export function ProductInfo({ product, onAddToCart }: ProductInfoProps) {
+export function ProductInfo({ product, onAddToCart, onBuyNow }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
 
@@ -31,6 +32,10 @@ export function ProductInfo({ product, onAddToCart }: ProductInfoProps) {
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), FEEDBACK_DURATION_MS);
   }, [onAddToCart, product, quantity]);
+
+  const handleBuyNow = useCallback(() => {
+    onBuyNow(product, quantity);
+  }, [onBuyNow, product, quantity]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -91,14 +96,22 @@ export function ProductInfo({ product, onAddToCart }: ProductInfoProps) {
         </div>
       )}
 
-      <Button
-        variant="primary"
-        className="mt-2 w-full sm:w-auto"
-        onClick={handleAddToCart}
-        disabled={!inStock}
-      >
-        {justAdded ? '✓ Agregado al carrito' : inStock ? 'Agregar al carrito' : 'Agotado'}
-      </Button>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Button
+          variant="primary"
+          className="mt-2 w-full sm:w-auto"
+          onClick={handleAddToCart}
+          disabled={!inStock}
+        >
+          {justAdded ? '✓ Agregado al carrito' : inStock ? 'Agregar al carrito' : 'Agotado'}
+        </Button>
+
+        {inStock && (
+          <Button variant="secondary" className="mt-2 w-full sm:w-auto" onClick={handleBuyNow}>
+            Comprar ahora
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
