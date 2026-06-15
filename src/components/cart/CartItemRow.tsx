@@ -1,5 +1,7 @@
 import { memo } from 'react';
+import { Link } from 'react-router-dom';
 import { formatPrice } from '../../lib/format/currency';
+import { useUiStore } from '../../store/ui.store';
 import type { CartItem } from '../../types/cart';
 
 interface CartItemRowProps {
@@ -10,15 +12,25 @@ interface CartItemRowProps {
 }
 
 function CartItemRowComponent({ item, onIncrement, onDecrement, onRemove }: CartItemRowProps) {
+  const closeCart = useUiStore((state) => state.closeCart);
+
   return (
     <li className="flex gap-3 border-b border-black/10 py-3">
-      <img
-        src={item.thumbnail}
-        alt={item.title}
-        className="h-16 w-16 rounded-md border border-black/10 object-cover"
-      />
+      <Link to={`/product/${item.id}`} onClick={closeCart} className="shrink-0">
+        <img
+          src={item.thumbnail}
+          alt={item.title}
+          className="h-16 w-16 rounded-md border border-black/10 object-cover"
+        />
+      </Link>
       <div className="flex flex-1 flex-col gap-1">
-        <span className="line-clamp-2 text-sm font-medium text-brand-dark">{item.title}</span>
+        <Link
+          to={`/product/${item.id}`}
+          onClick={closeCart}
+          className="line-clamp-2 text-sm font-medium text-brand-dark hover:text-brand-primary hover:underline"
+        >
+          {item.title}
+        </Link>
         <span className="text-sm font-semibold text-brand-dark">{formatPrice(item.price)}</span>
         <div className="flex items-center gap-2">
           <button
