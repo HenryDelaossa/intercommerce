@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { useCart } from '../../hooks/cart/useCart';
 import { useCheckout } from '../../hooks/cart/useCheckout';
@@ -15,12 +15,19 @@ export function CartDrawer() {
   const { items, summary, incrementItem, decrementItem, removeItem, clearCart } = useCart();
   const { confirmPurchase } = useCheckout();
   const { syncStock } = useStockSync();
+  const asideRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (isCartOpen) {
       void syncStock();
     }
   }, [isCartOpen, syncStock]);
+
+  useLayoutEffect(() => {
+    if (!isCartOpen && asideRef.current?.contains(document.activeElement)) {
+      (document.activeElement as HTMLElement).blur();
+    }
+  }, [isCartOpen]);
 
   return (
     <>
@@ -33,6 +40,7 @@ export function CartDrawer() {
         aria-hidden="true"
       />
       <aside
+        ref={asideRef}
         className={clsx(
           'fixed top-0 right-0 z-50 flex h-full w-full max-w-sm flex-col bg-brand-light shadow-xl transition-transform',
           isCartOpen ? 'translate-x-0' : 'translate-x-full',
