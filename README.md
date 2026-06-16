@@ -45,7 +45,11 @@ src/
 ### Requisitos
 
 - Node.js 20 o superior
-- pnpm (el proyecto usa `pnpm-lock.yaml`)
+- pnpm (el proyecto usa `pnpm-lock.yaml`). Si no lo tienes instalado:
+
+  ```bash
+  npm install -g pnpm
+  ```
 
 ### Pasos
 
@@ -102,4 +106,22 @@ Si quieres que se vuelvan a ejecutar automáticamente mientras editas código:
 pnpm test:watch
 ```
 
-La suite incluye una prueba de integración (`src/__tests__/addToCart.test.tsx`) que renderiza la app completa, agrega un producto al carrito desde la página de detalle, abre el drawer del carrito y verifica que el subtotal, el IVA y el total se actualicen con los valores correctos.
+### Cobertura
+
+Para generar el reporte de cobertura (resumen en terminal + HTML navegable en `coverage/`):
+
+```bash
+pnpm test:coverage
+```
+
+La carpeta `coverage/` está en `.gitignore` y no se versiona.
+
+### Pruebas incluidas
+
+La suite tiene dos pruebas de integración que cubren los flujos principales del negocio:
+
+**`src/__tests__/addToCart.test.tsx` — Agregar al carrito**
+Renderiza la app en la página de detalle de un producto, lo agrega al carrito y verifica que el subtotal, el IVA y el total del drawer se actualicen con los valores correctos.
+
+**`src/__tests__/checkoutFlow.test.tsx` — Flujo de checkout completo**
+Recorre el proceso completo: agregar un producto, iniciar sesión cuando se intenta confirmar la compra, completar la dirección de envío y el método de pago, verificar el total en el resumen y confirmar la compra. Valida que el carrito quede vacío y que aparezca el toast de confirmación.
