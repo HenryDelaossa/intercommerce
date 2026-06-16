@@ -92,6 +92,18 @@ src/
    pnpm lint
    ```
 
+## Usuarios de prueba
+
+La app tiene autenticación simulada con usuarios precargados. Para iniciar sesión hacé click en **"Iniciar sesión"** en el Header y usá cualquiera de estas credenciales:
+
+| Nombre | Correo | Contraseña |
+|---|---|---|
+| Ana Torres | ana.torres@intercommerce.com | Ana1234 |
+| Carlos Pérez | carlos.perez@intercommerce.com | Carlos1234 |
+| Lucía Gómez | lucia.gomez@intercommerce.com | Lucia1234 |
+
+Iniciar sesión es necesario para poder completar el flujo de checkout. Si intentás confirmar una compra sin estar autenticado, la app abre el modal de login automáticamente y retoma el proceso una vez que entrás.
+
 ## Pruebas (unitarias e integración)
 
 Para correr toda la suite de pruebas una sola vez:
